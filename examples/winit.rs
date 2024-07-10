@@ -23,7 +23,7 @@ pub(crate) fn entry(event_loop: EventLoop<()>) {
         |_elwt, (window, context)| softbuffer::Surface::new(context, window.clone()).unwrap(),
     )
     .with_event_handler(|(window, _context), surface, event, elwt| {
-        elwt.set_control_flow(ControlFlow::Wait);
+        elwt.set_control_flow(ControlFlow::Poll);
 
         match event {
             Event::WindowEvent {
@@ -53,6 +53,12 @@ pub(crate) fn entry(event_loop: EventLoop<()>) {
 
                     buffer.present().unwrap();
                 }
+            }
+            Event::Suspended => {
+                println!("Suspended");
+            }
+            Event::Resumed => {
+                println!("Suspended");
             }
             Event::WindowEvent {
                 event:

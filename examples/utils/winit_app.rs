@@ -10,6 +10,11 @@ use winit::window::{Window, WindowAttributes, WindowId};
 /// Run a Winit application.
 #[allow(unused_mut)]
 pub(crate) fn run_app(event_loop: EventLoop<()>, mut app: impl ApplicationHandler<()> + 'static) {
+    #[cfg(target_os = "android")]
+    android_logger::init_once(
+        android_logger::Config::default().with_max_level(log::LevelFilter::Debug),
+    );
+
     #[cfg(not(any(target_arch = "wasm32", target_arch = "wasm64")))]
     event_loop.run_app(&mut app).unwrap();
 
@@ -109,10 +114,9 @@ where
     Handler: FnMut(&mut T, Option<&mut S>, Event<()>, &ActiveEventLoop),
 {
     fn resumed(&mut self, el: &ActiveEventLoop) {
-        debug_assert!(self.state.is_none());
-        let mut state = (self.init)(el);
-        self.surface_state = Some((self.init_surface)(el, &mut state));
-        self.state = Some(state);
+        debug_assert!(self.surface_state.is_none());
+        let state = self.state.get_or_insert_with(|| (self.init)(el));
+        self.surface_state = Some((self.init_surface)(el, state));
     }
 
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
