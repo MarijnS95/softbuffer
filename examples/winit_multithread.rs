@@ -5,7 +5,7 @@
 mod winit_app;
 
 #[cfg(not(target_family = "wasm"))]
-mod ex {
+pub mod ex {
     use std::num::NonZeroU32;
     use std::sync::{mpsc, Arc, Mutex};
     use winit::event::{Event, KeyEvent, WindowEvent};
@@ -60,9 +60,7 @@ mod ex {
         }
     }
 
-    pub(super) fn entry() {
-        let event_loop = EventLoop::new().unwrap();
-
+    pub fn entry(event_loop: EventLoop<()>) {
         let app = winit_app::WinitAppBuilder::with_init(
             |elwt| {
                 let attributes = Window::default_attributes();
@@ -87,7 +85,7 @@ mod ex {
 
                 (window, context, start_render, finish_render)
             },
-            |_elwt, (window, context, start_render, finish_render)| {
+            |_elwt, (window, context, _start_render, _finish_render)| {
                 println!("making surface...");
                 Arc::new(Mutex::new(
                     softbuffer::Surface::new(context, window.clone()).unwrap(),
@@ -141,6 +139,8 @@ mod ex {
     }
 }
 
+#[cfg(not(target_os = "android"))]
 fn main() {
-    ex::entry();
+    use winit::event_loop::EventLoop;
+    ex::entry(EventLoop::new().unwrap())
 }
