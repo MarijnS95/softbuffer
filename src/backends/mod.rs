@@ -3,6 +3,8 @@ use raw_window_handle::HasDisplayHandle;
 
 #[cfg(target_os = "android")]
 pub(crate) mod android;
+#[cfg(target_os = "android")]
+pub(crate) mod android_surfacecontrol;
 #[cfg(target_vendor = "apple")]
 pub(crate) mod cg;
 #[cfg(kms_platform)]

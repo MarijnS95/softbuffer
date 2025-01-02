@@ -1,4 +1,6 @@
 //! Implementation of software buffering for Android.
+//!
+//! This module converts the input buffer into a bitmap and then stretches it to the window.
 
 use std::marker::PhantomData;
 use std::num::{NonZeroI32, NonZeroU32};
@@ -120,9 +122,9 @@ pub struct BufferImpl<'a, D: ?Sized, W> {
 }
 
 // TODO: Move to NativeWindowBufferLockGuard?
-unsafe impl<'a, D, W> Send for BufferImpl<'a, D, W> {}
+unsafe impl<D, W> Send for BufferImpl<'_, D, W> {}
 
-impl<'a, D: HasDisplayHandle, W: HasWindowHandle> BufferInterface for BufferImpl<'a, D, W> {
+impl<D: HasDisplayHandle, W: HasWindowHandle> BufferInterface for BufferImpl<'_, D, W> {
     fn width(&self) -> NonZeroU32 {
         NonZeroU32::new(self.native_window_buffer.width() as u32).unwrap()
     }
